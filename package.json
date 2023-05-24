@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "prepare": "husky install"
   },
   "author": "",
   "license": "ISC",
@@ -16,5 +17,13 @@
     "jsonwebtoken": "^9.0.0",
     "mongodb": "^5.5.0",
     "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.2",
+    "prettier": "2.8.8"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
   }
 }

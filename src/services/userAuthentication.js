@@ -9,16 +9,17 @@ const key = fs.readFileSync(keyPath);
 const authentication = async (req, res, next) => {
   const user = req.body.username;
   const pwd = req.body.password;
+  //disaccoppiare la logica del db dal controllo delle credenziali
+  //User.getUser(user)
   if ((await db.getUser(user, pwd)) !== null) {
     const token = jwt.sign(
       {
         username: user,
-        password: pwd,
       },
       key,
       { algorithm: "RS256" }
     );
-    res.send({ token: token });
+    return res.send({ token: token });
   } else {
     res.send("auth failed");
   }

@@ -6,10 +6,10 @@ const db = require("./DataBase");
 const keyPath = path.resolve("./certs/private.key");
 const key = fs.readFileSync(keyPath);
 
-const authentication = (req, res, next) => {
+const authentication = async (req, res, next) => {
   const user = req.body.username;
   const pwd = req.body.password;
-  if (db.getUser(user, pwd) !== undefined) {
+  if ((await db.getUser(user, pwd)) !== null) {
     const token = jwt.sign(
       {
         username: user,
@@ -19,8 +19,9 @@ const authentication = (req, res, next) => {
       { algorithm: "RS256" }
     );
     res.send({ token: token });
+  } else {
+    res.send("auth failed");
   }
-  res.send("auth failed");
 };
 
 module.exports = authentication;

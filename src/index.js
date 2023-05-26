@@ -24,9 +24,8 @@ const main = async () => {
   server.listen(port, () => {
     console.log(`server listening on http://localhost:${port}`);
   });
-
-  db.closeConnection();
 };
 main().catch((e) => {
   console.error(e);
+  db.closeConnection();
 });

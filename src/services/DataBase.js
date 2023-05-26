@@ -6,12 +6,9 @@ const db_ip = configuration["db-ip"];
 
 class DataBase {
   constructor() {
-    this.uri;
-    this.client;
+    this.uri = "mongodb://10.200.200.20:27017";
+    this.client = new MongoClient(this.uri);
   }
-
-  uri = "mongodb://10.200.200.20:27017";
-  client = new MongoClient(uri);
 
   async connection() {
     try {
@@ -29,10 +26,12 @@ class DataBase {
 
   async getUser(userName, password) {
     const collection = this.client.db("test").collection("users");
-    return await collection.findOne({
+    const result = await collection.findOne({
       username: userName,
       password: password,
     });
+    console.log(result);
+    return result;
   }
 }
 module.exports = new DataBase();

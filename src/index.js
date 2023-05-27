@@ -1,9 +1,10 @@
+const argParser = require("./argsParser");
 const bodyParser = require("body-parser");
 const express = require("express");
 const http = require("http");
 const api = require("./routing");
 const crtPath = require("./services/authorize");
-const configuration = require("../configurations/configuration.json");
+const configuration = require(argParser);
 const loggers = require("./services/loggers");
 const db = require("./services/DataBase");
 

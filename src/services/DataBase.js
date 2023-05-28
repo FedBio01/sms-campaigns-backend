@@ -25,14 +25,11 @@ class DataBase {
     console.log("db connection closed");
   }
 
-  async getUser(userName, password) {
-    const collection = this.client.db("test").collection("users");
-    const result = await collection.findOne({
-      username: userName,
-      password: password,
-    });
-    console.log(result);
-    return result;
+  async getDocument(value, collection) {
+    return await this.client.db("test").collection(collection).findOne(value);
+  }
+  async insertDocument(value, collection) {
+    await this.client.db("test").collection(collection).insertOne(value);
   }
 }
 module.exports = new DataBase();

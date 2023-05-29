@@ -1,6 +1,6 @@
 const http = require("http");
 const argParser = require("./argsParser");
-const configuration = require(`../${argParser}`);
+const configuration = require(`${argParser}`);
 const port = configuration["server-port"];
 const express = require("express");
 

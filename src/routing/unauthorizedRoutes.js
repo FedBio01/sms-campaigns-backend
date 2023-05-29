@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const userAuth = require("../services/userAuthentication.js");
-const userReg = require("../services/userRegistration.js");
-router.post("/login", userAuth);
-router.post("/signUp", userReg);
+const login = require("../routing/sign/login");
+
+router.use(login);
+
 module.exports = router;

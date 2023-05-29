@@ -1,7 +1,7 @@
 const express = require("express");
 const authorizedRoutes = require("./authorizedRoutes.js");
 const unauthorizedRoutes = require("./unauthorizedRoutes.js");
-const authorize = require("../services/authorize.js");
+const authorize = require("./user/authorize.js");
 const router = express.Router();
 
 router.use(unauthorizedRoutes);

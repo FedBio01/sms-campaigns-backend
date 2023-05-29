@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcrypt");
-const User = require("../repositories/User");
+const User = require("../../repositories/User");
 
 const keyPath = path.resolve("./certs/private.key");
 const key = fs.readFileSync(keyPath);

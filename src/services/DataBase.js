@@ -1,9 +1,7 @@
 const { MongoClient } = require("mongodb");
-const dbConfig = require("../argsParser");
+const dbConfig = require("./argsParser");
 const configuration = require(`../${dbConfig}`);
 const db_ip = configuration["db-ip"];
-//const uri = "mongodb://10.200.200.20:27017"
-//const client = new MongoClient(uri)
 
 class DataBase {
   constructor() {

@@ -12,6 +12,7 @@ class User {
   static async insertUser(username, password) {
     await db.insertDocument(
       {
+        _id: username,
         username: username,
         password: password,
       },

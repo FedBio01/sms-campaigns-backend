@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const User = require("../../repositories/User");
+const WrongParameterError = require("../../errors/WrongParameterError");
 
 const keyPath = path.resolve("./certs/private.key");
 const key = fs.readFileSync(keyPath);
@@ -25,10 +26,10 @@ const authentication = async (req, res, next) => {
       );
       return res.send({ token: token });
     } else {
-      res.send("wrong password");
+      next(new WrongParameterError("password errata"));
     }
   } else {
-    res.send("wrong username");
+    next(new WrongParameterError("username errato"));
   }
 };
 

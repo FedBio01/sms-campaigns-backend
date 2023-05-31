@@ -11,20 +11,18 @@ const key = fs.readFileSync(keyPath);
 const authentication = async (req, res, next) => {
   const reqPwd = req.body.password;
   const reqUsrName = req.body.username;
-  //disaccoppiare la logica del db dal controllo delle credenziali
-  //User.getUser(user)
+  const reqEmail = req.body.email;
   const user = await User.getUserByUsername(reqUsrName);
   if (user != null) {
     const hash = user.password;
     if (await bcrypt.compare(reqPwd, hash)) {
-      const token = jwt.sign(
-        {
-          username: user,
-        },
-        key,
-        { algorithm: "RS256" }
-      );
-      return res.send({ token: token });
+      /*↓*/
+      const userClone = Object.assign({}, user);
+      delete userClone.password;
+      delete userClone._id;
+      /*↑*/
+      const token = jwt.sign(userClone, key, { algorithm: "RS256" });
+      return res.send({ token, user: userClone });
     } else {
       next(new WrongParameterError("password errata"));
     }

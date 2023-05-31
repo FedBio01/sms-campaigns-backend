@@ -1,7 +1,7 @@
 const db = require("../services/DataBase");
 
-class User {
-  static async getUser(username) {
+class UserRepo {
+  static async getUserByUsername(username) {
     return await db.getDocument(
       {
         username: username,
@@ -21,4 +21,4 @@ class User {
   }
 }
 
-module.exports = User;
+module.exports = UserRepo;

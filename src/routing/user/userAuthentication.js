@@ -2,20 +2,18 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcrypt");
-const User = require("../../repositories/UserRepo");
+const UserRepo = require("../../repositories/UserRepo");
 const WrongParameterError = require("../../errors/WrongParameterError");
 
 const keyPath = path.resolve("./certs/private.key");
 const key = fs.readFileSync(keyPath);
 
 const authentication = async (req, res, next) => {
-  const reqPwd = req.body.password;
   const reqUsrName = req.body.username;
-  const reqEmail = req.body.email;
-  const user = await User.getUserByUsername(reqUsrName);
+  const user = await UserRepo.getUserByUsername(reqUsrName);
   if (user != null) {
     const hash = user.password;
-    if (await bcrypt.compare(reqPwd, hash)) {
+    if (await bcrypt.compare(user.password, hash)) {
       /*↓*/
       const userClone = Object.assign({}, user);
       delete userClone.password;

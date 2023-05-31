@@ -1,7 +1,8 @@
 class User {
-  constructor() {
-    this.username = null;
-    this.email = null;
-    this.password = null;
+  constructor(username, email, password) {
+    this.username = username;
+    this.email = email;
+    this.password = password;
   }
 }
+module.exports = User;

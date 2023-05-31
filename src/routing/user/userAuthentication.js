@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcrypt");
-const User = require("../../repositories/User");
+const User = require("../../repositories/UserRepo");
 const WrongParameterError = require("../../errors/WrongParameterError");
 
 const keyPath = path.resolve("./certs/private.key");
@@ -13,7 +13,7 @@ const authentication = async (req, res, next) => {
   const reqUsrName = req.body.username;
   //disaccoppiare la logica del db dal controllo delle credenziali
   //User.getUser(user)
-  const user = await User.getUser(reqUsrName);
+  const user = await User.getUserByUsername(reqUsrName);
   if (user != null) {
     const hash = user.password;
     if (await bcrypt.compare(reqPwd, hash)) {

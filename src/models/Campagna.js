@@ -1,0 +1,3 @@
+class Campagna {
+  constructor() {}
+}

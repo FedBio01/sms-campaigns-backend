@@ -7,12 +7,14 @@ class DataBase {
   constructor() {
     this.uri = `mongodb://${db_ip}`;
     this.client = new MongoClient(this.uri);
+    this.dbName = null;
   }
 
   async connection() {
     try {
       await this.client.connect();
       console.log("db connected");
+      this.dbName = this.client.db("test");
     } catch (e) {
       console.error(e);
     }
@@ -24,10 +26,10 @@ class DataBase {
   }
 
   async getDocument(value, collection) {
-    return await this.client.db("test").collection(collection).findOne(value);
+    return await this.dbName.collection(collection).findOne(value);
   }
   async insertDocument(value, collection) {
-    await this.client.db("test").collection(collection).insertOne(value);
+    await this.dbName.collection(collection).insertOne(value);
   }
 }
 module.exports = new DataBase();

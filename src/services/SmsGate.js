@@ -1,10 +1,15 @@
+const args = require("./argsParser");
+const configuration = require(`${args}`);
+const configUrl = configuration["sms-gate-url"];
+const configSysId = configuration["sms-gate-systemid"];
+const configPwd = configuration["sms-gate-password"];
 var smpp = require("smpp");
-class smsGate {
+class SmsGate {
   session;
   constructor() {
-    this.url = "smpp://10.69.11.249:8003";
-    this.system_id = "42396";
-    this.password = "SMSG4T3";
+    this.url = configUrl;
+    this.system_id = configSysId;
+    this.password = configPwd;
   }
   connect() {
     try {
@@ -12,39 +17,59 @@ class smsGate {
         {
           url: this.url,
           auto_enquire_link_period: 10000,
-          debug: true,
+          debug: false,
         },
         () => {
           console.log("SMS_Gate connected");
-          this.session.bind_transceiver({
-            system_id: this.system_id,
-            password: this.password,
-          });
+          this.session.bind_transceiver(
+            {
+              system_id: this.system_id,
+              password: this.password,
+            },
+            () => {
+              if (pdu.command_status === 0) console.log("successfully bound");
+            }
+          );
         }
       );
     } catch (error) {
       console.error(e);
     }
   }
-  sendSms(sms, onSucces, onReject) {
+  sendSms(sms, onSuccess, onReject) {
+    console.log("sendSms" + sms.destinationNumber);
+    let smsDestinationNum = sms.destinationNumber;
+    let smsMessage = sms.message;
     try {
-      session.submit_sm(
+      this.session.submit_sm(
         {
-          destinationAddr: sms.destinationNum,
-          shortMessage: sms.message,
+          destination_addr: smsDestinationNum,
+          short_message: smsMessage,
         },
         (pdu) => {
           if (pdu.command_status === 0) {
-            console.log(pdu.message_id);
-            return onSucces();
+            console.log("in pducallback " + sms.destinationNumber);
+            console.log("pdu id:" + pdu.message_id);
+
+            return onSuccess(sms);
           }
-          return onReject();
+          return onReject(sms);
         }
       );
     } catch (error) {
-      console.error(e);
+      console.error(error);
     }
   }
+  /*
+    sendSmsMock(sms, onSucces, onReject){
+    let smsDestinationNum = sms.destinationNumber
+    let smsMessage = sms.message
+    console.log(smsDestinationNum);
+    console.log(smsMessage);
+    if(smsDestinationNum == '3486701408')
+      return onSucces(sms);
+    return onReject(sms);
+  }*/
 }
 
-module.exports = new smsGate();
+module.exports = new SmsGate();

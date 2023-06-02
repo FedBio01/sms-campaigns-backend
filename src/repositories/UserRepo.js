@@ -9,12 +9,12 @@ class UserRepo {
       "users"
     );
   }
-  static async insertUser(username, email, password) {
+  static async insertUser(user) {
     await db.insertDocument(
       {
-        username: username,
-        email: email,
-        password: password,
+        username: `${user.username}`,
+        email: `${user.email}`,
+        password: `${user.password}`,
       },
       "users"
     );

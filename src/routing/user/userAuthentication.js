@@ -12,6 +12,8 @@ const authentication = async (req, res, next) => {
   const reqPwd = req.body.password;
   const reqUsrName = req.body.username;
   const user = await UserRepo.getUserByUsername(reqUsrName);
+  console.log(user);
+  console.log(reqPwd);
   if (user != null) {
     const hash = user.password;
     if (await bcrypt.compare(reqPwd, hash)) {

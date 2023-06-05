@@ -3,6 +3,7 @@ const SmsRepo = require("../repositories/SmsRepo");
 const smsGate = require("../services/SmsGate");
 const Sms = require("../models/Sms");
 const router = express.Router();
+const { DateTime } = require("luxon");
 
 router.get("/test", (req, res, next) => {
   res.send("rotta di prova autorizzata");
@@ -17,7 +18,11 @@ const onSuccess = async (sms) => {
   } catch (error) {
     console.error(error);
   }
-  await SmsRepo.updateSmsStatus(retrievedSms, "sent");
+  await SmsRepo.updateSmsStatusAndSentTime(
+    retrievedSms,
+    "sent",
+    DateTime.now().toISO()
+  );
 };
 
 const onReject = async (sms) => {
@@ -33,7 +38,7 @@ const onReject = async (sms) => {
 router.post("/sendSms", async (req, res, next) => {
   const destNumber = req.body.destinationNumber;
   const message = req.body.message;
-  const sms = new Sms(destNumber, message);
+  const sms = new Sms(destNumber, message, DateTime.now().toISO());
   try {
     await SmsRepo.insertSms(sms);
   } catch (error) {

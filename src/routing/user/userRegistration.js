@@ -25,6 +25,6 @@ const userRegistration = async (req, res, next) => {
     console.error(error);
     return next(error);
   }
-  res.send("registration successful");
+  res.send({ text: "registration successful" });
 };
 module.exports = userRegistration;

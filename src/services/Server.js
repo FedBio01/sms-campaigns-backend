@@ -9,6 +9,7 @@ const requestLogger = require("../routing/middleware/requestLogger.js");
 const bodyParser = require("body-parser");
 const apiRouter = require("../routing");
 const cors = require("cors");
+
 class Server {
   constructor() {
     this.app = express();

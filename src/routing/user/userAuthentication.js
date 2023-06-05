@@ -22,11 +22,10 @@ const authentication = async (req, res, next) => {
   if (user != null) {
     const hash = user.password;
     if (await bcrypt.compare(reqPwd, hash)) {
-      /*↓*/
       const userClone = Object.assign({}, user);
       delete userClone.password;
       delete userClone._id;
-      /*↑*/
+
       const token = jwt.sign(userClone, key, { algorithm: "RS256" });
       return res.send({ token, user: userClone });
     } else {

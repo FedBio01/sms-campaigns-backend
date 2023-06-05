@@ -12,6 +12,7 @@ class SmsRepo {
       console.error(error);
     }
   }
+
   static async updateSmsStatus(sms, valore) {
     await db.modifyDocument(
       smsCollection,
@@ -20,6 +21,17 @@ class SmsRepo {
         $set: { status: valore },
       },
       null
+    );
+  }
+
+  static async updateSmsStatusAndSentTime(sms, valore, time) {
+    await db.modifyDocument(
+      smsCollection,
+      sms,
+      {
+        $set: { sentTime: time, status: valore },
+      },
+      { upsert: true }
     );
   }
 }

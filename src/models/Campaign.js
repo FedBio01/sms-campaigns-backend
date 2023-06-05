@@ -1,6 +1,10 @@
 class Campaign {
-  constructor(name, smsRef) {
-    this.name = this.name;
+  constructor(name, creator, messageText, smsRef) {
+    this.name = name;
+    this.creator = creator;
+    this.messageText = messageText;
     this.sms = smsRef;
   }
 }
+
+module.exports = Campaign;

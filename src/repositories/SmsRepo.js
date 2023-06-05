@@ -2,26 +2,12 @@ const db = require("../services/DataBase");
 const smsCollection = "sms";
 class SmsRepo {
   static async getSms(sms) {
-    return await db.getDocument(
-      {
-        destinationNumber: sms.destinationNumber,
-        message: sms.message,
-        status: sms.status,
-      },
-      "sms"
-    );
+    return await db.getDocument(sms, "sms");
   }
 
   static async insertSms(sms) {
     try {
-      await db.insertDocument(
-        {
-          destinationNumber: sms.destinationNumber,
-          message: sms.message,
-          status: sms.status,
-        },
-        "sms"
-      );
+      return await db.insertDocument(sms, "sms");
     } catch (error) {
       console.error(error);
     }

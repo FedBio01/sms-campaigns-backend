@@ -1,4 +1,5 @@
 const db = require("../services/DataBase");
+const userCollcetion = "user";
 
 class UserRepo {
   static async getUserByUsername(username) {
@@ -6,18 +7,12 @@ class UserRepo {
       {
         username: username,
       },
-      "users"
+      userCollcetion
     );
   }
+
   static async insertUser(user) {
-    await db.insertDocument(
-      {
-        username: `${user.username}`,
-        email: `${user.email}`,
-        password: `${user.password}`,
-      },
-      "users"
-    );
+    await db.insertDocument(user, userCollcetion);
   }
 }
 

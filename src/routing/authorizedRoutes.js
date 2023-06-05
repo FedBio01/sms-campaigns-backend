@@ -17,8 +17,9 @@ const onSuccess = async (sms) => {
   } catch (error) {
     console.error(error);
   }
-  retrievedSms.status = "sent";
+  //retrievedSms.status = "sent";
   await SmsRepo.insertSms(retrievedSms);
+  //await SmsRepo.updateSmsStatus(retrivedSms, "sent");
 };
 
 const onReject = async (sms) => {
@@ -30,6 +31,7 @@ const onReject = async (sms) => {
   }
   retrievedSms.status = "rejected";
   await SmsRepo.insertSms(retrievedSms);
+  //await SmsRepo.updateSmsStatus(retrivedSms, "sent");
 };
 
 router.post("/sendSms", async (req, res, next) => {
@@ -42,7 +44,6 @@ router.post("/sendSms", async (req, res, next) => {
     console.error(error);
   }
   smsGate.sendSms(sms, onSuccess, onReject);
-  //smsGate.sendSmsMock(sms, onSuccess, onReject)
   res.send("done");
 });
 

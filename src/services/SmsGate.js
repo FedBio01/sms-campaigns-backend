@@ -19,7 +19,7 @@ class SmsGate {
           auto_enquire_link_period: 10000,
           debug: false,
         },
-        () => {
+        (pdu) => {
           console.log("SMS_Gate connected");
           this.session.bind_transceiver(
             {
@@ -60,16 +60,6 @@ class SmsGate {
       console.error(error);
     }
   }
-  /*
-    sendSmsMock(sms, onSucces, onReject){
-    let smsDestinationNum = sms.destinationNumber
-    let smsMessage = sms.message
-    console.log(smsDestinationNum);
-    console.log(smsMessage);
-    if(smsDestinationNum == '3486701408')
-      return onSucces(sms);
-    return onReject(sms);
-  }*/
 }
 
 module.exports = new SmsGate();

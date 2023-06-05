@@ -7,8 +7,12 @@ const MissingParameterError = require("../../errors/MissingParameterError");
 
 const userRegistration = async (req, res, next) => {
   let user = new User(req.body.username, req.body.email, req.body.password);
-  if (user.username === null || user.email === null || user.password === null) {
-    return res.next(new MissingParameterError("parametri mancanti"));
+  if (
+    user.username === undefined ||
+    user.email === undefined ||
+    user.password === undefined
+  ) {
+    return next(new MissingParameterError("parametri mancanti"));
   }
 
   const saltRound = 10;

@@ -12,10 +12,9 @@ const key = fs.readFileSync(keyPath);
 const authentication = async (req, res, next) => {
   const reqPwd = req.body.password;
   const reqUsrName = req.body.username;
-  const reqEmail = req.body.email;
 
-  if (reqPwd === null || reqUsrName === null || reqEmail === null) {
-    return res.next(new MissingParameterError("parametri mancanti"));
+  if (reqPwd === undefined || reqUsrName === undefined) {
+    return next(new MissingParameterError("parametri mancanti"));
   }
 
   const user = await UserRepo.getUserByUsername(reqUsrName);

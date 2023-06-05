@@ -5,6 +5,17 @@ class SmsRepo {
     return await db.getDocument(sms, "sms");
   }
 
+  static async getSmsById(smsIds) {
+    return await db.getDocument(
+      {
+        _id: {
+          $in: smsIds,
+        },
+      },
+      "sms"
+    );
+  }
+
   static async insertSms(sms) {
     try {
       return await db.insertDocument(sms, "sms");
@@ -17,6 +28,20 @@ class SmsRepo {
     await db.modifyDocument(
       smsCollection,
       sms,
+      {
+        $set: { status: valore },
+      },
+      null
+    );
+  }
+
+  static async updateSmsStatusByCampaign(sms, valore) {
+    const campaign = sms.campaign;
+    await db.modifyDocument(
+      smsCollection,
+      {
+        campaign: campaign,
+      },
       {
         $set: { status: valore },
       },

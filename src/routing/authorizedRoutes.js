@@ -17,9 +17,7 @@ const onSuccess = async (sms) => {
   } catch (error) {
     console.error(error);
   }
-  //retrievedSms.status = "sent";
-  await SmsRepo.insertSms(retrievedSms);
-  //await SmsRepo.updateSmsStatus(retrivedSms, "sent");
+  await SmsRepo.updateSmsStatus(retrievedSms, "sent");
 };
 
 const onReject = async (sms) => {
@@ -29,9 +27,7 @@ const onReject = async (sms) => {
   } catch (error) {
     console.error(error);
   }
-  retrievedSms.status = "rejected";
-  await SmsRepo.insertSms(retrievedSms);
-  //await SmsRepo.updateSmsStatus(retrivedSms, "sent");
+  await SmsRepo.updateSmsStatus(retrievedSms, "sent");
 };
 
 router.post("/sendSms", async (req, res, next) => {

@@ -70,10 +70,22 @@ class SmsGate {
           short_message: message,
         },
         (pdu) => {
+          /*
+            there'll be as many answer pdus as the elements in destinationNumbers array (i think), the single pdu reffered at the sending
+            events of a sms will have a field named destination_addr filled with the corresponding phone destination number.
+            i'm going to search for a sms object with that destinationNumber and pass it to Onsuccess/Onreject 
+            callback 
+            */
+          let pduReferredSms;
+          smsArray.foreach((sms) => {
+            if (sms.destinationNumber === pdu.destination_addr) {
+              pduReferredSms = sms;
+            }
+          });
           if (pdu.command_status === 0) {
-            return onSuccesCampaign(smsArray);
+            return onSuccesCampaign(pduReferredSms);
           }
-          return onRejectCampaign(smsArray);
+          return onRejectCampaign(pduReferredSms);
         }
       );
     } catch (error) {

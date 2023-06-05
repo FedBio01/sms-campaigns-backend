@@ -5,23 +5,37 @@ const CampaignRepo = require("../repositories/CampaignRepo");
 const SmsRepo = require("../repositories/SmsRepo");
 const Sms = require("../models/Sms");
 const Campaign = require("../models/Campaign");
+const { DateTime } = require("luxon");
 router.use(login);
 
 const inizializeSms = async (req, res, next) => {
   /*
     
     */
-  req.body.creator;
-  req.body.name;
-  req.body.messageText;
-  req.body.numbers;
-
-  let smsid = await SmsRepo.insertSms(
-    new Sms(req.body.numbers, req.body.messageText)
-  ).insertedId;
-  let campaignResult = await CampaignRepo.insertCampagna(
-    new Campaign(req.body.name, req.body.creator, req.body.messageText, smsid)
+  let creator = req.body.creator;
+  let name = req.body.name;
+  let messageText = req.body.messageText;
+  let numbers = req.body.numbers;
+  let creationTime = DateTime.now().toISO();
+  let smsArray = numbers.map((number) => {
+    return {
+      name: name,
+      destinationNumber: number,
+      message: messageText,
+      status: "append",
+      creationTime: creationTime,
+    };
+  });
+  console.log(smsArray);
+  let smsids = await SmsRepo.insertSms(smsArray);
+  let ids = smsids.insertedIds;
+  let campagna = new Campaign(
+    req.body.name,
+    req.body.creator,
+    req.body.messageText,
+    Object.values(ids)
   );
+  let campaignResult = await CampaignRepo.insertCampagna([campagna]);
 
   return res.send(campaignResult);
 };

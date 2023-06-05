@@ -1,5 +1,5 @@
 const db = require("../services/DataBase");
-
+const smsCollection = "sms";
 class SmsRepo {
   static async getSms() {
     /*
@@ -12,6 +12,16 @@ class SmsRepo {
     await db.insertDocument()
     */
     return null;
+  }
+  static async updateSmsStatus(sms, valore) {
+    await db.modifyDocument(
+      smsCollection,
+      sms,
+      {
+        $set: { status: valore },
+      },
+      null
+    );
   }
 }
 

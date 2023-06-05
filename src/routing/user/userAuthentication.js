@@ -12,9 +12,8 @@ const key = fs.readFileSync(keyPath);
 const authentication = async (req, res, next) => {
   const reqPwd = req.body.password;
   const reqUsrName = req.body.username;
-  const reqEmail = req.body.email;
 
-  if (reqPwd === null || reqUsrName === null || reqEmail === null) {
+  if (reqPwd === undefined || reqUsrName === undefined) {
     return next(new MissingParameterError("parametri mancanti"));
   }
 
@@ -23,11 +22,10 @@ const authentication = async (req, res, next) => {
   if (user != null) {
     const hash = user.password;
     if (await bcrypt.compare(reqPwd, hash)) {
-      /*↓*/
       const userClone = Object.assign({}, user);
       delete userClone.password;
       delete userClone._id;
-      /*↑*/
+
       const token = jwt.sign(userClone, key, { algorithm: "RS256" });
       return res.send({ token, user: userClone });
     } else {

@@ -8,7 +8,6 @@ const errorHandler = require("../routing/middleware/errorHandler.js");
 const requestLogger = require("../routing/middleware/requestLogger.js");
 const bodyParser = require("body-parser");
 const apiRouter = require("../routing");
-
 const cors = require("cors");
 
 class Server {

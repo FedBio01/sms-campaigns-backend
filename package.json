@@ -21,7 +21,8 @@
     "jsonwebtoken": "^9.0.0",
     "luxon": "^3.3.0",
     "mongodb": "^5.5.0",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "smpp": "^0.6.0-rc.4"
   },
   "devDependencies": {
     "husky": "^8.0.3",

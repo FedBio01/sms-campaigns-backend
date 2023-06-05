@@ -1,17 +1,30 @@
 const db = require("../services/DataBase");
 const smsCollection = "sms";
 class SmsRepo {
-  static async getSms() {
-    /*
-    return await db.getDocument()
-    */
-    return null;
+  static async getSms(sms) {
+    return await db.getDocument(
+      {
+        destinationNumber: sms.destinationNumber,
+        message: sms.message,
+        status: sms.status,
+      },
+      "sms"
+    );
   }
-  static async insertSms() {
-    /*
-    await db.insertDocument()
-    */
-    return null;
+
+  static async insertSms(sms) {
+    try {
+      await db.insertDocument(
+        {
+          destinationNumber: sms.destinationNumber,
+          message: sms.message,
+          status: sms.status,
+        },
+        "sms"
+      );
+    } catch (error) {
+      console.error(error);
+    }
   }
   static async updateSmsStatus(sms, valore) {
     await db.modifyDocument(

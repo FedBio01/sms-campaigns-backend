@@ -15,7 +15,7 @@ const authentication = async (req, res, next) => {
   const reqEmail = req.body.email;
 
   if (reqPwd === null || reqUsrName === null || reqEmail === null) {
-    return next(new MissingParameterError("parametri mancanti"));
+    return res.next(new MissingParameterError("parametri mancanti"));
   }
 
   const user = await UserRepo.getUserByUsername(reqUsrName);

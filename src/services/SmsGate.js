@@ -37,7 +37,6 @@ class SmsGate {
     }
   }
   sendSms(sms, onSuccess, onReject) {
-    console.log("sendSms" + sms.destinationNumber);
     let smsDestinationNum = sms.destinationNumber;
     let smsMessage = sms.message;
     try {
@@ -48,12 +47,33 @@ class SmsGate {
         },
         (pdu) => {
           if (pdu.command_status === 0) {
-            console.log("in pducallback " + sms.destinationNumber);
-            console.log("pdu id:" + pdu.message_id);
-
             return onSuccess(sms);
           }
           return onReject(sms);
+        }
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  sendCampaign(smsArray, onSuccesCampaign, onRejectCampaign) {
+    let message = smsArray[0].message;
+    let arrayLenght = smsArray.length;
+    let destinationNumbers = new Array(arrayLenght);
+    smsArray.foreach((sms) => {
+      destinationNumbers.push(sms.destinationNumber);
+    });
+    try {
+      this.session.submit_multi(
+        {
+          dest_address: destinationNumbers,
+          short_message: message,
+        },
+        (pdu) => {
+          if (pdu.command_status === 0) {
+            return onSuccesCampaign(smsArray);
+          }
+          return onRejectCampaign(smsArray);
         }
       );
     } catch (error) {

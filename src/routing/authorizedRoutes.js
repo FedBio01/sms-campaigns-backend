@@ -27,9 +27,22 @@ const onReject = async (sms) => {
   } catch (error) {
     console.error(error);
   }
-  await SmsRepo.updateSmsStatus(retrievedSms, "sent");
+  await SmsRepo.updateSmsStatus(retrievedSms, "rejected");
 };
-
+const onSuccesCampaign = async (smsArray) => {
+  try {
+    SmsRepo.updateSmsStatus(smsArray, "sent");
+  } catch (error) {
+    console.error(error);
+  }
+};
+const onRejectCampaign = async (smsArray) => {
+  try {
+    SmsRepo.updateSmsStatus(smsArray, "rejected");
+  } catch (error) {
+    console.error(error);
+  }
+};
 router.post("/sendSms", async (req, res, next) => {
   const destNumber = req.body.destinationNumber;
   const message = req.body.message;
@@ -41,6 +54,13 @@ router.post("/sendSms", async (req, res, next) => {
   }
   smsGate.sendSms(sms, onSuccess, onReject);
   res.send("done");
+});
+router.post("/sendCampaign", (req, res, next) => {
+  const campaing = req.body.campaign;
+  const refArray = campaing.smss;
+  let smsArray = SmsRepo.getSmsById(refArray);
+  smsGate.sendCampaign(smsArray, onSuccesCampaign, onRejectCampaign);
+  res.send("campaign sent");
 });
 
 module.exports = router;

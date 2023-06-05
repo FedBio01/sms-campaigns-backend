@@ -18,8 +18,9 @@ const onSuccess = async (sms) => {
   } catch (error) {
     console.error(error);
   }
+
   await SmsRepo.updateSmsStatusAndSentTime(
-    retrievedSms,
+    retrievedSms[0],
     "sent",
     DateTime.now().toISO()
   );
@@ -34,19 +35,25 @@ const onReject = async (sms) => {
   }
   await SmsRepo.updateSmsStatus(retrievedSms, "rejected");
 };
+
 const onSuccesCampaign = async (smsArray) => {
+  let retrivedArray;
   try {
-    SmsRepo.updateSmsStatus(smsArray, "sent");
+    retrivedArray = await SmsRepo.getSms(smsArray); //chiedere
   } catch (error) {
     console.error(error);
   }
+  await SmsRepo.updateSmsStatus(smsArray, "sent");
 };
+
 const onRejectCampaign = async (smsArray) => {
+  let retrivedArray;
   try {
-    SmsRepo.updateSmsStatus(smsArray, "rejected");
+    retrivedArray = await SmsRepo.getSms(smsArray);
   } catch (error) {
     console.error(error);
   }
+  await SmsRepo.updateSmsStatus(smsArray, "rejected");
 };
 router.post("/sendSms", async (req, res, next) => {
   const destNumber = req.body.destinationNumber;
@@ -60,10 +67,11 @@ router.post("/sendSms", async (req, res, next) => {
   smsGate.sendSms(sms, onSuccess, onReject);
   res.send("done");
 });
-router.post("/sendCampaign", (req, res, next) => {
+
+router.post("/sendCampaign", async (req, res, next) => {
   const campaing = req.body.campaign;
   const refArray = campaing.smss;
-  let smsArray = SmsRepo.getSmsById(refArray);
+  let smsArray = await SmsRepo.getSmsById(refArray);
   smsGate.sendCampaign(smsArray, onSuccesCampaign, onRejectCampaign);
   res.send("campaign sent");
 });

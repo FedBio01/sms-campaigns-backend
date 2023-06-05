@@ -28,4 +28,4 @@ class CampaignRepo {
   }
 }
 
-module.exports = CampagnaRepo;
+module.exports = CampaignRepo;

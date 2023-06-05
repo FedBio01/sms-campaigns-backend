@@ -27,11 +27,11 @@ class DataBase {
   }
 
   async getDocument(value, collection) {
-    return await this.dbName.collection(collection).findOne(value);
+    return await this.dbName.collection(collection).find(value).toArray();
   }
 
   async insertDocument(value, collection) {
-    return await this.dbName.collection(collection).insertOne(value);
+    return await this.dbName.collection(collection).insertMany(value);
   }
 
   /*
@@ -44,7 +44,7 @@ class DataBase {
   async modifyDocument(collection, query, updateDoc, options) {
     return await this.dbName
       .collection(collection)
-      .updateOne(query, updateDoc, options);
+      .updateMany(query, updateDoc, options);
   }
 
   /*

@@ -17,7 +17,7 @@ const authentication = async (req, res, next) => {
     return next(new MissingParameterError("parametri mancanti"));
   }
 
-  const user = await UserRepo.getUserByUsername(reqUsrName);
+  const [user] = await UserRepo.getUserByUsername(reqUsrName);
 
   if (user != null) {
     const hash = user.password;

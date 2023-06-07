@@ -56,42 +56,57 @@ class SmsGate {
       console.error(error);
     }
   }
+  sendCampaign(smsArray, onSuccess, onReject) {
+    smsArray.forEach((sms) => {
+      this.sendSms(sms, onSuccess, onReject);
+    });
+  }
+  /*
   sendCampaign(smsArray, onSuccesCampaign, onRejectCampaign) {
     let message = smsArray[0].message;
     let arrayLenght = smsArray.length;
-    let destinationNumbers = new Array(arrayLenght);
-    smsArray.foreach((sms) => {
-      destinationNumbers.push(sms.destinationNumber);
+    let destinationNumbers = new Array();
+    
+    smsArray.forEach((sms) => {
+      destinationNumbers.push({"dl_name": sms.destinationNumber});
     });
+    console.log(destinationNumbers);
+    let strigOfdestinations = destinationNumbers.join(";");
+    console.log("stringanumeri: "+strigOfdestinations);
     try {
+      console.log("sono quì")
       this.session.submit_multi(
         {
           dest_address: destinationNumbers,
           short_message: message,
         },
         (pdu) => {
-          /*
+          
             there'll be as many answer pdus as the elements in destinationNumbers array (i think), the single pdu reffered at the sending
             events of a sms will have a field named destination_addr filled with the corresponding phone destination number.
             i'm going to search for a sms object with that destinationNumber and pass it to Onsuccess/Onreject 
             callback 
-            */
+            
           let pduReferredSms;
-          smsArray.foreach((sms) => {
+          smsArray.forEach((sms) => {
             if (sms.destinationNumber === pdu.destination_addr) {
               pduReferredSms = sms;
             }
           });
+          console.log("pdu di risposta "+pdu)
+          console.log("smsArray "+ smsArray)
           if (pdu.command_status === 0) {
+            console.log("sono qui")
             return onSuccesCampaign(pduReferredSms);
           }
+          console.log("pduRefferredSms "+pduReferredSms)
           return onRejectCampaign(pduReferredSms);
         }
       );
     } catch (error) {
       console.error(error);
     }
-  }
+  }*/
 }
 
 module.exports = new SmsGate();

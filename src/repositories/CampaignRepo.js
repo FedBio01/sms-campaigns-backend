@@ -15,7 +15,7 @@ class CampaignRepo {
   static async getCampaignByName(name) {
     return await db.getDocument(
       {
-        _id: name,
+        name: name,
       },
       campaignCollection
     );

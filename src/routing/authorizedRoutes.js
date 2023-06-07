@@ -4,6 +4,7 @@ const smsGate = require("../services/SmsGate");
 const Sms = require("../models/Sms");
 const router = express.Router();
 const { DateTime } = require("luxon");
+const campaignRepo = require("../repositories/CampaignRepo");
 
 router.get("/test", (req, res, next) => {
   res.send("rotta di prova autorizzata");
@@ -14,13 +15,13 @@ const onSuccess = async (sms) => {
   console.log("onSuccess " + sms.destinationNumber);
   let retrievedSms;
   try {
-    retrievedSms = await SmsRepo.getSms(sms);
+    retrievedSms = await SmsRepo.getSms([sms]);
   } catch (error) {
     console.error(error);
   }
 
   await SmsRepo.updateSmsStatusAndSentTime(
-    retrievedSms[0],
+    retrievedSms,
     "sent",
     DateTime.now().toISO()
   );
@@ -29,10 +30,11 @@ const onSuccess = async (sms) => {
 const onReject = async (sms) => {
   let retrievedSms;
   try {
-    retrievedSms = await SmsRepo.getSms(sms);
+    retrievedSms = await SmsRepo.getSms([sms]);
   } catch (error) {
     console.error(error);
   }
+  console.log("retrived sms " + retrievedSms);
   await SmsRepo.updateSmsStatus(retrievedSms, "rejected");
 };
 /*
@@ -70,10 +72,12 @@ router.post("/sendSms", async (req, res, next) => {
 });
 
 router.post("/sendCampaign", async (req, res, next) => {
-  const campaing = req.body.campaign;
-  const refArray = campaing.smss;
+  const campaing = req.body.campaign; //nome della campagna
+  const retrivedCampaign = await campaignRepo.getCampaignByName(campaing);
+  //console.log(retrivedCampaign);
+  const refArray = retrivedCampaign[0].smss;
   let smsArray = await SmsRepo.getSmsById(refArray);
-  console.log(smsArray);
+  //console.log(smsArray);
   smsGate.sendCampaign(smsArray, onSuccess, onReject);
   //smsGate.sendCampaign(smsArray, onSuccesCampaign, onRejectCampaign);
   res.send("campaign sent");

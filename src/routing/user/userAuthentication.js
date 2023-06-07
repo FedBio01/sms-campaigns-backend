@@ -17,17 +17,16 @@ const authentication = async (req, res, next) => {
     return next(new MissingParameterError("parametri mancanti"));
   }
 
-  const [user] = await UserRepo.getUserByUsername(reqUsrName);
+  const userDB = await UserRepo.getUserByUsername(reqUsrName);
 
-  if (user != null) {
-    const hash = user.password;
+  if (userDB != null) {
+    const hash = userDB.password;
     if (await bcrypt.compare(reqPwd, hash)) {
-      const userClone = Object.assign({}, user);
-      delete userClone.password;
-      delete userClone._id;
+      const user = Object.assign({}, userDB);
+      delete user.password;
 
-      const token = jwt.sign(userClone, key, { algorithm: "RS256" });
-      return res.send({ token, user: userClone });
+      const token = jwt.sign(user, key, { algorithm: "RS256" });
+      return res.send({ token, user: user });
     } else {
       return next(new WrongParameterError("password errata"));
     }

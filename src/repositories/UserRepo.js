@@ -3,16 +3,13 @@ const userCollcetion = "users";
 
 class UserRepo {
   static async getUserByUsername(username) {
-    return await db.getDocument(
-      {
-        username: username,
-      },
-      userCollcetion
-    );
+    return await db.getSingleDocument(userCollcetion, {
+      username: username,
+    });
   }
 
   static async insertUser(user) {
-    await db.insertDocument(user, userCollcetion);
+    await db.insertSingleDocument(userCollcetion, user);
   }
 }
 

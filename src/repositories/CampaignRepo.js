@@ -18,7 +18,7 @@ class CampaignRepo {
    * @returns the campaign searched or null
    */
   static async getCampaignByName(name) {
-    return await db.getDocument(campaignCollection, {
+    return await db.getSingleDocument(campaignCollection, {
       name: name,
     });
   }

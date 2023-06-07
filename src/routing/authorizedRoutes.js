@@ -15,7 +15,7 @@ const onSuccess = async (sms) => {
   console.log("onSuccess " + sms.destinationNumber);
   let retrievedSms;
   try {
-    retrievedSms = await SmsRepo.getSms([sms]);
+    retrievedSms = await SmsRepo.getSms(sms);
   } catch (error) {
     console.error(error);
   }
@@ -30,7 +30,7 @@ const onSuccess = async (sms) => {
 const onReject = async (sms) => {
   let retrievedSms;
   try {
-    retrievedSms = await SmsRepo.getSms([sms]);
+    retrievedSms = await SmsRepo.getSms(sms);
   } catch (error) {
     console.error(error);
   }
@@ -75,8 +75,8 @@ router.post("/sendCampaign", async (req, res, next) => {
   const campaing = req.body.campaign; //nome della campagna
   const retrivedCampaign = await campaignRepo.getCampaignByName(campaing);
   //console.log(retrivedCampaign);
-  const refArray = retrivedCampaign[0].smss;
-  let smsArray = await SmsRepo.getSmsById(refArray);
+  const refArray = retrivedCampaign.smss;
+  let smsArray = await SmsRepo.getMultipleSmsById(refArray);
   //console.log(smsArray);
   smsGate.sendCampaign(smsArray, onSuccess, onReject);
   //smsGate.sendCampaign(smsArray, onSuccesCampaign, onRejectCampaign);

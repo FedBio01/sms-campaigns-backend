@@ -18,7 +18,7 @@ const initializeCampaign = async (req, res, next) => {
     return sms;
   });
 
-  let smsids = await SmsRepo.insertSms(smsArray);
+  let smsids = await SmsRepo.insertMultipleSms(smsArray);
 
   let campaign = new Campaign(
     campaignName,

@@ -20,14 +20,25 @@ class SmsRepo {
    * @param {array} smsIds - array of sms ids
    * @returns array of sms object
    */
-  static async getSmsById(smsIds) {
+  static async getSmsById(smsId) {
     return await db.getSingleDocument(smsCollection, {
       _id: {
-        $in: smsIds,
+        $in: smsId,
       },
     });
   }
-
+  /**
+   *
+   * @param {*} smsArrayId
+   * @returns
+   */
+  static async getMultipleSmsById(smsArrayId) {
+    return await db.getMultipleDocuments(smsCollection, {
+      _id: {
+        $in: smsArrayId,
+      },
+    });
+  }
   //insert
   /**
    * insert the sms given in the database
@@ -41,7 +52,18 @@ class SmsRepo {
       console.error(error);
     }
   }
-
+  /**
+   *
+   * @param {*} sms
+   * @returns
+   */
+  static async insertMultipleSms(sms) {
+    try {
+      return await db.insertMultipleDocuments(smsCollection, sms);
+    } catch (error) {
+      console.error(error);
+    }
+  }
   //update
   /**
    * update the sms status field

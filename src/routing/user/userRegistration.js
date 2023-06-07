@@ -1,8 +1,6 @@
-const db = require("../../services/DataBase");
 const UserRepo = require("../../repositories/UserRepo");
 const User = require("../../models/User");
 const bcrypt = require("bcrypt");
-const WrongParameterError = require("../../errors/WrongParameterError");
 const MissingParameterError = require("../../errors/MissingParameterError");
 
 const userRegistration = async (req, res, next) => {
@@ -20,7 +18,7 @@ const userRegistration = async (req, res, next) => {
   const pwd = await bcrypt.hash(user.password, salt);
   user.password = pwd;
   try {
-    await UserRepo.insertUser([user]);
+    await UserRepo.insertUser(user);
   } catch (error) {
     console.error(error);
     return next(error);

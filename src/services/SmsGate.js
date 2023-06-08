@@ -56,57 +56,115 @@ class SmsGate {
       console.error(error);
     }
   }
+  /*
   sendCampaign(smsArray, onSuccess, onReject) {
     smsArray.forEach((sms) => {
+      const sleep = () => {
+        return new Promise(resolve => setTimeout(resolve, 200))
+      }
       this.sendSms(sms, onSuccess, onReject);
     });
   }
-  /*
-  sendCampaign(smsArray, onSuccesCampaign, onRejectCampaign) {
+*/
+
+  sendCampaign(smsArray, onSuccess, onReject) {
     let message = smsArray[0].message;
     let arrayLenght = smsArray.length;
     let destinationNumbers = new Array();
-    
+
     smsArray.forEach((sms) => {
-      destinationNumbers.push({"dl_name": sms.destinationNumber});
+      destinationNumbers.push({ destination_addr: sms.destinationNumber });
     });
     console.log(destinationNumbers);
-    let strigOfdestinations = destinationNumbers.join(";");
-    console.log("stringanumeri: "+strigOfdestinations);
+    //let strigOfdestinations = destinationNumbers.join(";");
     try {
-      console.log("sono quì")
+      //console.log("sono quì")
       this.session.submit_multi(
         {
           dest_address: destinationNumbers,
           short_message: message,
         },
         (pdu) => {
-          
-            there'll be as many answer pdus as the elements in destinationNumbers array (i think), the single pdu reffered at the sending
-            events of a sms will have a field named destination_addr filled with the corresponding phone destination number.
-            i'm going to search for a sms object with that destinationNumber and pass it to Onsuccess/Onreject 
-            callback 
-            
-          let pduReferredSms;
-          smsArray.forEach((sms) => {
+          //let pduReferredSms;
+          /*smsArray.forEach((sms) => {
             if (sms.destinationNumber === pdu.destination_addr) {
               pduReferredSms = sms;
             }
-          });
-          console.log("pdu di risposta "+pdu)
-          console.log("smsArray "+ smsArray)
+          });*/
+          //pduReferredSms = smsArray[pdu.message_id];
+
           if (pdu.command_status === 0) {
-            console.log("sono qui")
-            return onSuccesCampaign(pduReferredSms);
+            let pduUnsuccessField = pdu.unsuccess_sme;
+            console.log("pdu.unsuccess_sme " + pdu.unsuccess_sme);
+            console.log("failedMessages " + failedMessages);
+
+            //creo due array, uno di messaggi da mandare onSuccess e uno da mandare Onreject
+            let sentMessages = new Array();
+            let rejectedMessages = new Array();
+            //if(pduUnsuccessField.length > 0){
+            /*
+              failedMessages.forEach(failedMessage => {
+                smsArray.forEach(sms => {
+                  if(sms.destinationNumber === failedMessage.destination_addr){
+                    onReject(sms);
+                  }      
+                });
+              });
+              */
+
+            //popolo l'array dei messaggi rifiutati confrontando il numero del messaggio rifiutato con i messaggi di smsArray, se vi trovo un messaggio con tale numero
+            //lo aggiungo all'array rejectedMessages
+            smsArray.forEach((sms) => {
+              pduUnsuccessField.forEach((element) => {
+                if (element.dest_address === sms.destinationNumber) {
+                  rejectedMessages.push(sms);
+                }
+              });
+            });
+            //popolo l'array dei messaggi inviati confrontando i messaggi inviati con i messaggi rifiutati, i messaggi che hanno destinationNumber differente da tutti i messaggi contenuti
+            //nell'array rejectedMessages saranno andanti a buon fine e saranno inseriti nell'array sent messages
+            smsArray.forEach((sms) => {
+              let rejected = false;
+              rejectedMessages.forEach((rejectedSms) => {
+                if (sms.destinationNumber === rejectedSms.destinationNumber) {
+                  rejected = true;
+                }
+              });
+              if (!rejected) sentMessages.push(sms);
+            });
+
+            //}
+            /*
+            smsArray.forEach(sms =>{
+              let present = false;
+              failedMessages.forEach(failedMessage => {
+                if(sms.destinationNumber === failedMessage.dest_address){
+                  present = true;
+                }
+              })
+              if(!present){
+                onSuccess(sms)
+              }   
+            });
+            return;
+            */
+            rejectedMessages.forEach((sms) => {
+              onReject(sms);
+            });
+            sentMessages.forEach((sms) => {
+              onSuccess(sms);
+            });
+            return;
           }
-          console.log("pduRefferredSms "+pduReferredSms)
-          return onRejectCampaign(pduReferredSms);
+          smsArray.forEach((sms) => {
+            onReject(sms);
+          });
         }
       );
     } catch (error) {
       console.error(error);
     }
-  }*/
+  }
 }
 
 module.exports = new SmsGate();

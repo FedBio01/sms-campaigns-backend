@@ -31,7 +31,7 @@ const initializeCampaign = async (req, res, next) => {
   console.log(campaign);
   let campaignResult = await CampaignRepo.insertCampaign(campaign);
 
-  return res.send("campagna creata");
+  return res.send(campaignResult);
 };
 
 module.exports = initializeCampaign;

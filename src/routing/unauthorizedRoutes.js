@@ -2,30 +2,14 @@ const express = require("express");
 const router = express.Router();
 const login = require("../routing/sign/login");
 const CampaignRepo = require("../repositories/CampaignRepo");
-const SmsRepo = require("../repositories/SmsRepo");
-const Sms = require("../models/Sms");
-const Campaign = require("../models/Campaign");
 router.use(login);
 
-const inizializeSms = async (req, res, next) => {
-  /*
-    
-    */
-  req.body.creator;
-  req.body.name;
-  req.body.messageText;
-  req.body.numbers;
+router.get("/prova", async (req, res, next) => {
+  let prova = await CampaignRepo.getAllCampign();
+  res.send(prova);
+});
 
-  let smsid = await SmsRepo.insertSms(
-    new Sms(req.body.numbers, req.body.messageText)
-  ).insertedId;
-  let campaignResult = await CampaignRepo.insertCampagna(
-    new Campaign(req.body.name, req.body.creator, req.body.messageText, smsid)
-  );
-
-  return res.send(campaignResult);
-};
-
-router.post("/campaign", inizializeSms);
+const initializeCampaign = require("./initializeCampaign");
+router.post("/initializeCampaign", initializeCampaign);
 
 module.exports = router;

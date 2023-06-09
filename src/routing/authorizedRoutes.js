@@ -35,6 +35,14 @@ const onSuccess = async (sms) => {
   );
 };
 
+const onSuccessArray = async (sms) => {
+  await SmsRepo.updateMultipleSmsStatusAndSentTime(
+    sms,
+    "sent",
+    DateTime.now().toISO()
+  );
+};
+
 const onReject = async (sms) => {
   let retrievedSms;
   try {
@@ -44,6 +52,11 @@ const onReject = async (sms) => {
   }
   console.log("retrived sms " + retrievedSms);
   await SmsRepo.updateSmsStatus(retrievedSms, "rejected");
+};
+
+const onRejectArray = async (sms) => {
+  console.log("retrived sms " + sms);
+  await SmsRepo.updateMultipleSmsStatus(sms, "rejected");
 };
 /*
 const onSuccesCampaign = async (sms) => {
@@ -86,7 +99,8 @@ router.post("/sendCampaign", async (req, res, next) => {
   const refArray = retrivedCampaign.smss;
   let smsArray = await SmsRepo.getMultipleSmsById(refArray);
   //console.log(smsArray);
-  smsGate.sendCampaign(smsArray, onSuccess, onReject);
+  smsGate.sendCampaign(smsArray, onSuccessArray, onRejectArray);
+
   //smsGate.sendCampaign(smsArray, onSuccesCampaign, onRejectCampaign);
   res.send("campaign sent");
 });

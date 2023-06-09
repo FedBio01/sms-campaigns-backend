@@ -81,6 +81,21 @@ class SmsRepo {
     );
   }
 
+  static async updateMultipleSmsStatus(sms, valore) {
+    await db.modifyMultipleDocuments(
+      smsCollection,
+      {
+        _id: {
+          $in: sms,
+        },
+      },
+      {
+        $set: { status: valore },
+      },
+      null
+    );
+  }
+
   /**
    * update the sms status field
    * @param {Array} sms - sms to update
@@ -110,6 +125,21 @@ class SmsRepo {
     await db.modifySingleDocument(
       smsCollection,
       sms,
+      {
+        $set: { sentTime: time, status: status },
+      },
+      { upsert: true }
+    );
+  }
+
+  static async updateMultipleSmsStatusAndSentTime(sms, status, time) {
+    await db.modifyMultipleDocuments(
+      smsCollection,
+      {
+        _id: {
+          $in: sms,
+        },
+      },
       {
         $set: { sentTime: time, status: status },
       },

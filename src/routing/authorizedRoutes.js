@@ -4,7 +4,15 @@ const smsGate = require("../services/SmsGate");
 const Sms = require("../models/Sms");
 const router = express.Router();
 const { DateTime } = require("luxon");
-const campaignRepo = require("../repositories/CampaignRepo");
+const CampaignRepo = require("../repositories/CampaignRepo");
+
+const userCampaign = async (req, res, next) => {
+  let creator = req.body.user.username;
+  let campaignArray = await CampaignRepo.getMultipleCampaignByCreator(creator);
+  res.send({ campaign: campaignArray });
+};
+
+router.get("/userCampaing", userCampaign);
 
 router.get("/test", (req, res, next) => {
   res.send("rotta di prova autorizzata");
@@ -28,6 +36,14 @@ const onSuccess = async (sms) => {
   //res.send({"text": "done"});
 };
 
+const onSuccessArray = async (sms) => {
+  await SmsRepo.updateMultipleSmsStatusAndSentTime(
+    sms,
+    "sent",
+    DateTime.now().toISO()
+  );
+};
+
 const onReject = async (sms) => {
   let retrievedSms;
   try {
@@ -37,6 +53,11 @@ const onReject = async (sms) => {
   }
   console.log("retrived sms " + retrievedSms);
   await SmsRepo.updateSmsStatus(retrievedSms, "rejected");
+};
+
+const onRejectArray = async (sms) => {
+  console.log("retrived sms " + sms);
+  await SmsRepo.updateMultipleSmsStatus(sms, "rejected");
 };
 /*
 const onSuccesCampaign = async (sms) => {
@@ -74,12 +95,13 @@ router.post("/sendSms", async (req, res, next) => {
 
 router.post("/sendCampaign", async (req, res, next) => {
   const campaing = req.body.campaign; //nome della campagna
-  const retrivedCampaign = await campaignRepo.getCampaignByName(campaing);
+  const retrivedCampaign = await CampaignRepo.getCampaignByName(campaing);
   //console.log(retrivedCampaign);
   const refArray = retrivedCampaign.smss;
   let smsArray = await SmsRepo.getMultipleSmsById(refArray);
   //console.log(smsArray);
-  smsGate.sendCampaign(smsArray, onSuccess, onReject);
+  smsGate.sendCampaign(smsArray, onSuccessArray, onRejectArray);
+
   //smsGate.sendCampaign(smsArray, onSuccesCampaign, onRejectCampaign);
   res.send("campaign sent");
 });

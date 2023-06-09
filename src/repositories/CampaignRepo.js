@@ -8,7 +8,7 @@ class CampaignRepo {
    * @param campaign - campaign da cercare nel db
    * @returns the searched campaign
    */
-  static async getCampign(campaign) {
+  static async getCampaign(campaign) {
     return db.getSingleDocument(campaignCollection, campaign);
   }
 
@@ -24,8 +24,18 @@ class CampaignRepo {
   }
 
   //get multiple
-  static async getAllCampign() {
-    return db.getMultipleDocuments(campaignCollection);
+  static async getAllCampaign() {
+    return await db.getMultipleDocuments(campaignCollection);
+  }
+  /**
+   *
+   * @param {*} creatorName
+   * @returns
+   */
+  static async getMultipleCampaignByCreator(creator) {
+    return await db.getMultipleDocuments(campaignCollection, {
+      creator: creator,
+    });
   }
 
   //insert

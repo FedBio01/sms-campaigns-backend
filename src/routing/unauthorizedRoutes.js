@@ -5,7 +5,7 @@ const CampaignRepo = require("../repositories/CampaignRepo");
 router.use(login);
 
 router.get("/prova", async (req, res, next) => {
-  let prova = await CampaignRepo.getAllCampign();
+  let prova = await CampaignRepo.getAllCampaign();
   res.send(prova);
 });
 

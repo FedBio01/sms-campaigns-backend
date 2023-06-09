@@ -19,10 +19,11 @@ const onSuccess = async (sms) => {
     console.error(error);
   }
   await SmsRepo.updateSmsStatusAndSentTime(
-    retrievedSms,
+    retrievedSms[0],
     "sent",
     DateTime.now().toISO()
   );
+  //res.send({"text": "done"});
 };
 
 const onReject = async (sms) => {
@@ -33,19 +34,20 @@ const onReject = async (sms) => {
     console.error(error);
   }
   await SmsRepo.updateSmsStatus(retrievedSms, "sent");
+  //res.send({"text": "error"});
 };
 
 router.post("/sendSms", async (req, res, next) => {
   const destNumber = req.body.destinationNumber;
   const message = req.body.message;
-  const sms = new Sms(destNumber, message, DateTime.now().toISO());
+  let sms = new Sms(destNumber, message, DateTime.now().toISO());
   try {
-    await SmsRepo.insertSms(sms);
+    await SmsRepo.insertSms([sms]);
   } catch (error) {
     console.error(error);
   }
   smsGate.sendSms(sms, onSuccess, onReject);
-  res.send("done");
+  //res.send("done");
 });
 
 module.exports = router;

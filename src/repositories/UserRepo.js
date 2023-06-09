@@ -1,5 +1,5 @@
 const db = require("../services/DataBase");
-const userCollcetion = "users";
+const userCollection = "users";
 
 class UserRepo {
   static async getUserByUsername(username) {
@@ -7,12 +7,12 @@ class UserRepo {
       {
         username: username,
       },
-      userCollcetion
+      userCollection
     );
   }
 
   static async insertUser(user) {
-    await db.insertDocument(user, userCollcetion);
+    await db.insertDocument(user, userCollection);
   }
 }
 

@@ -99,7 +99,14 @@ router.post("/sendCampaign", async (req, res, next) => {
   const refArray = retrivedCampaign.smss;
   let smsArray = await SmsRepo.getMultipleSmsById(refArray);
   //console.log(smsArray);
-  smsGate.sendCampaign(smsArray, onSuccessArray, onRejectArray);
+  //smsGate.sendCampaign(smsArray, onSuccessArray, onRejectArray);
+
+  let maxCap = 3;
+  let upperbound = Math.ceil(smsArray.length / maxCap);
+
+  for (let i = 0; i < upperbound; i++) {
+    console.log(smsArray.slice(i * maxCap, i * maxCap + maxCap));
+  }
 
   //smsGate.sendCampaign(smsArray, onSuccesCampaign, onRejectCampaign);
   res.send("campaign sent");

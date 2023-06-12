@@ -38,6 +38,22 @@ class CampaignRepo {
     });
   }
 
+  //get multiple
+  static async getAllCampaign() {
+    return await db.getMultipleDocuments(campaignCollection);
+  }
+  /**
+   *
+   * @param {*} creatorName
+   * @returns
+   */
+  static async getMultipleCampaignNotActiveByCreator(creator) {
+    return await db.getMultipleDocuments(campaignCollection, {
+      creator: creator,
+      isStarted: false,
+    });
+  }
+
   //insert
   /**
    * insert campaign in the database
@@ -46,6 +62,28 @@ class CampaignRepo {
    */
   static async insertCampaign(campaign) {
     return await db.insertSingleDocument(campaignCollection, campaign);
+  }
+
+  static async updateCampaignStartTime(campaign, time) {
+    await db.modifySingleDocument(
+      campaignCollection,
+      campaign,
+      {
+        $set: { start: time, isStarted: true },
+      },
+      null
+    );
+  }
+
+  static async updateCampaignEndTime(campaign, time) {
+    await db.modifySingleDocument(
+      campaignCollection,
+      campaign,
+      {
+        $set: { finish: time },
+      },
+      null
+    );
   }
 }
 

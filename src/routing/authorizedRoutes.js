@@ -29,10 +29,11 @@ const onSuccess = async (sms) => {
   }
 
   await SmsRepo.updateSmsStatusAndSentTime(
-    retrievedSms,
+    retrievedSms[0],
     "sent",
     DateTime.now().toISO()
   );
+  //res.send({"text": "done"});
 };
 
 const onSuccessArray = async (sms) => {
@@ -55,8 +56,21 @@ const onReject = async (sms) => {
 };
 
 const onRejectArray = async (sms) => {
-  console.log("retrived sms " + sms);
+  console.log("retrived sms reject " + sms);
   await SmsRepo.updateMultipleSmsStatus(sms, "rejected");
+};
+
+const updateCampaign = async (campaign) => {
+  let retrievedCampaign;
+  try {
+    retrievedCampaign = await CampaignRepo.getCampaignByName(campaign);
+  } catch (error) {
+    console.error(error);
+  }
+  await CampaignRepo.updateCampaignEndTime(
+    retrievedCampaign,
+    DateTime.now().toISO()
+  );
 };
 /*
 const onSuccesCampaign = async (sms) => {
@@ -82,9 +96,9 @@ const onRejectCampaign = async (sms) => {
 router.post("/sendSms", async (req, res, next) => {
   const destNumber = req.body.destinationNumber;
   const message = req.body.message;
-  const sms = new Sms(destNumber, message, DateTime.now().toISO());
+  let sms = new Sms(destNumber, message, DateTime.now().toISO());
   try {
-    await SmsRepo.insertSms(sms);
+    await SmsRepo.insertSms([sms]);
   } catch (error) {
     console.error(error);
   }
@@ -94,12 +108,17 @@ router.post("/sendSms", async (req, res, next) => {
 
 router.post("/sendCampaign", async (req, res, next) => {
   const campaing = req.body.campaign; //nome della campagna
+  console.log(campaing);
   const retrivedCampaign = await CampaignRepo.getCampaignByName(campaing);
-  //console.log(retrivedCampaign);
+  console.log(retrivedCampaign);
   const refArray = retrivedCampaign.smss;
   let smsArray = await SmsRepo.getMultipleSmsById(refArray);
   //console.log(smsArray);
-  //smsGate.sendCampaign(smsArray, onSuccessArray, onRejectArray);
+  await CampaignRepo.updateCampaignStartTime(
+    retrivedCampaign,
+    DateTime.now().toISO()
+  );
+  smsGate.sendCampaign(smsArray, onSuccessArray, onRejectArray, updateCampaign);
 
   let maxCap = 3;
   let upperbound = Math.ceil(smsArray.length / maxCap);
@@ -108,8 +127,14 @@ router.post("/sendCampaign", async (req, res, next) => {
     console.log(smsArray.slice(i * maxCap, i * maxCap + maxCap));
   }
 
-  //smsGate.sendCampaign(smsArray, onSuccesCampaign, onRejectCampaign);
-  res.send("campaign sent");
+  res.send({ message: "campaign sent" });
 });
 
+router.post("/userActivableCampaign", async (req, res, next) => {
+  const username = req.body.user.username;
+  console.log(username);
+  let userActiveCampaign =
+    await CampaignRepo.getMultipleCampaignNotActiveByCreator(username);
+  res.send(userActiveCampaign);
+});
 module.exports = router;

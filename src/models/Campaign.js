@@ -14,6 +14,7 @@ class Campaign {
     this.smss = smsRef;
     this.totalSms = totalSms;
     this.creationDate = creationDate;
+    this.isStarted = false;
     this.start = "not started";
     this.finish = "not finished";
   }

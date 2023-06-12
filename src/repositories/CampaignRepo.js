@@ -85,6 +85,64 @@ class CampaignRepo {
       null
     );
   }
+
+  //aggregate
+  static async getAllCampaignStatisticsByUser(creator) {
+    return await db.aggregate(
+      campaignCollection,
+      [
+        {
+          $match: {
+            creator: creator,
+          },
+        },
+        {
+          $lookup: {
+            from: "sms",
+            localField: "smss",
+            foreignField: "_id",
+            as: "sms_details",
+          },
+        },
+        {
+          $unwind: "$sms_details",
+        },
+        {
+          $group: {
+            _id: "$_id",
+            totalSent: {
+              $sum: {
+                $cond: [{ $eq: ["$sms_details.status", "sent"] }, 1, 0],
+              },
+            },
+            totalReject: {
+              $sum: {
+                $cond: [{ $eq: ["$sms_details.status", "reject"] }, 1, 0],
+              },
+            },
+            campaign: { $first: "$$ROOT" },
+          },
+        },
+        {
+          $replaceRoot: {
+            newRoot: {
+              $mergeObjects: [
+                "$campaign",
+                { totalSent: "$totalSent", totalReject: "$totalReject" },
+              ],
+            },
+          },
+        },
+        {
+          $project: {
+            smss: 0,
+            sms_details: 0,
+          },
+        },
+      ],
+      null
+    );
+  }
 }
 
 module.exports = CampaignRepo;

@@ -108,7 +108,8 @@ class DataBase {
   async aggregate(collection, pipeline, options) {
     return await this.dbName
       .collection(collection)
-      .aggregate(pipeline, options);
+      .aggregate(pipeline, options)
+      .toArray();
   }
 }
 module.exports = new DataBase();

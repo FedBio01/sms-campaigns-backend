@@ -1,11 +1,12 @@
 class Campaign {
   /**
-   *
    * @param {string} name - name of the campaign
    * @param {string} creator - name of the user that created the campaign
    * @param {string} messageText - the text of every single message
    * @param {array} smsRef - array of sms
+   * @param {int} totalSms - total sms of the campaing
    * @param {luxon.DateTime} creationDate - timestamp of the creation of the campaign
+
    */
   constructor(name, creator, messageText, smsRef, totalSms, creationDate) {
     this.name = name; //univoco

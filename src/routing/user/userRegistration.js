@@ -20,7 +20,6 @@ const userRegistration = async (req, res, next) => {
   try {
     await UserRepo.insertUser(user);
   } catch (error) {
-    console.error(error);
     return next(error);
   }
   res.send({ text: "registration successful" });

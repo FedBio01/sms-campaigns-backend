@@ -1,14 +1,15 @@
+const { MongoClient, ObjectId } = require("mongodb");
 const db = require("../services/DataBase");
 const smsCollection = "sms";
 
 class SmsRepo {
-  //get
+  //get single
   static async getSingleSms(sms) {
     return await db.getSingleDocument(smsCollection, sms);
   }
   /**
    * query the db for the existence of the sms
-   * @param {array} sms - array of sms to get from the database
+   * @param {Sms} sms - array of sms to get from the database
    * @returns an array contenent the sms
    */
   static async getSms(sms) {
@@ -17,7 +18,7 @@ class SmsRepo {
 
   /**
    * get sms from the id
-   * @param {array} smsIds - array of sms ids
+   * @param {ObjectId()} smsIds - array of sms ids
    * @returns array of sms object
    */
   static async getSmsById(smsId) {
@@ -27,10 +28,11 @@ class SmsRepo {
       },
     });
   }
+  //get multiple
   /**
-   *
-   * @param {*} smsArrayId
-   * @returns
+   *get multiple sms by the given id array
+   * @param {ObjectId()} smsArrayId - array of id
+   * @returns array of sms
    */
   static async getMultipleSmsById(smsArrayId) {
     return await db.getMultipleDocuments(smsCollection, {
@@ -39,35 +41,28 @@ class SmsRepo {
       },
     });
   }
-  //insert
+  //insert single
   /**
    * insert the sms given in the database
-   * @param {array} sms - vector of sms to insert in the database
-   * @returns object with aknowledget status and inserted ids of the sms
+   * @param {Sms} sms - vector of sms to insert in the database
+   * @returns object with aknowledged status and inserted ids of the sms
    */
   static async insertSms(sms) {
-    try {
-      return await db.insertSingleDocument(smsCollection, sms);
-    } catch (error) {
-      console.error(error);
-    }
+    return await db.insertSingleDocument(smsCollection, sms);
   }
   /**
-   *
-   * @param {*} sms
-   * @returns
+   * insert multiple sms in the db
+   * @param {Array} sms array of sms
+   * @returns object with aknowledged status and inserted ids of the sms
    */
+  //insert multiple
   static async insertMultipleSms(sms) {
-    try {
-      return await db.insertMultipleDocuments(smsCollection, sms);
-    } catch (error) {
-      console.error(error);
-    }
+    return await db.insertMultipleDocuments(smsCollection, sms);
   }
-  //update
+  //modify single
   /**
    * update the sms status field
-   * @param {array} sms - sms to update
+   * @param {Sms} sms - sms to update
    * @param valore - status value
    */
   static async updateSmsStatus(sms, valore) {
@@ -80,25 +75,9 @@ class SmsRepo {
       null
     );
   }
-
-  static async updateMultipleSmsStatus(sms, valore) {
-    await db.modifyMultipleDocuments(
-      smsCollection,
-      {
-        _id: {
-          $in: sms,
-        },
-      },
-      {
-        $set: { status: valore },
-      },
-      null
-    );
-  }
-
   /**
    * update the sms status field
-   * @param {Array} sms - sms to update
+   * @param {Sms} sms - sms to update
    * @param status - status
    */
   static async updateSmsStatusByCampaign(sms, status) {
@@ -114,11 +93,10 @@ class SmsRepo {
       null
     );
   }
-
   /**
    * update the sms status and time
-   * @param {array} sms - sms to update
-   * @param status - status
+   * @param {Sms} sms - sms to update
+   * @param {String} status - status
    * @param time - time
    */
   static async updateSmsStatusAndSentTime(sms, status, time) {
@@ -132,6 +110,32 @@ class SmsRepo {
     );
   }
 
+  //modify multiple
+  /**
+   * update multiple sms status
+   * @param {Array} sms
+   * @param {string} valore
+   */
+  static async updateMultipleSmsStatus(sms, valore) {
+    await db.modifyMultipleDocuments(
+      smsCollection,
+      {
+        _id: {
+          $in: sms,
+        },
+      },
+      {
+        $set: { status: valore },
+      },
+      null
+    );
+  }
+  /**
+   *
+   * @param {Array} sms
+   * @param {String} status
+   * @param {luxon.DateTime} time
+   */
   static async updateMultipleSmsStatusAndSentTime(sms, status, time) {
     await db.modifyMultipleDocuments(
       smsCollection,

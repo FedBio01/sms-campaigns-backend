@@ -1,8 +1,8 @@
 class Sms {
   /**
-   *
    * @param {string} destNumber - destination number
    * @param {string} message - message of the sms
+   * @param {string} status - status of the sms
    * @param {luxon.DateTime} creationTime - timestamp of the creation of the sms
    * @param {string} campaign - campaign name
    */

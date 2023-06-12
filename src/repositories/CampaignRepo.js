@@ -29,7 +29,7 @@ class CampaignRepo {
   }
   /**
    *
-   * @param {*} creatorName
+   * @param {} creatorName -
    * @returns
    */
   static async getMultipleCampaignByCreator(creator) {
@@ -38,12 +38,8 @@ class CampaignRepo {
     });
   }
 
-  //get multiple
-  static async getAllCampaign() {
-    return await db.getMultipleDocuments(campaignCollection);
-  }
   /**
-   *
+   *get multiple active campaign not active by the creator name
    * @param {*} creatorName
    * @returns
    */
@@ -54,7 +50,7 @@ class CampaignRepo {
     });
   }
 
-  //insert
+  //insert single
   /**
    * insert campaign in the database
    * @param {Array} campaign - campaign object
@@ -63,7 +59,12 @@ class CampaignRepo {
   static async insertCampaign(campaign) {
     return await db.insertSingleDocument(campaignCollection, campaign);
   }
-
+  //update single
+  /**
+   * update campaign start time
+   * @param {*} campaign - campaign name
+   * @param {*} time - time to set
+   */
   static async updateCampaignStartTime(campaign, time) {
     await db.modifySingleDocument(
       campaignCollection,
@@ -75,6 +76,11 @@ class CampaignRepo {
     );
   }
 
+  /**
+   * update campaign end time
+   * @param {*} campaign - campaign name
+   * @param {*} time - time to set
+   */
   static async updateCampaignEndTime(campaign, time) {
     await db.modifySingleDocument(
       campaignCollection,
@@ -87,13 +93,19 @@ class CampaignRepo {
   }
 
   //aggregate
-  static async getAllCampaignStatisticsByUser(creator) {
+  /**
+   * statistic of the requested campaign
+   * @param {string} creator - name of the user
+   * @returns array with statistics
+   */
+  static async getAllCampaignStatisticsByUserStarted(creator) {
     return await db.aggregate(
       campaignCollection,
       [
         {
           $match: {
             creator: creator,
+            isStarted: true,
           },
         },
         {
@@ -115,9 +127,9 @@ class CampaignRepo {
                 $cond: [{ $eq: ["$sms_details.status", "sent"] }, 1, 0],
               },
             },
-            totalReject: {
+            totalRejected: {
               $sum: {
-                $cond: [{ $eq: ["$sms_details.status", "reject"] }, 1, 0],
+                $cond: [{ $eq: ["$sms_details.status", "rejected"] }, 1, 0],
               },
             },
             campaign: { $first: "$$ROOT" },
@@ -128,7 +140,7 @@ class CampaignRepo {
             newRoot: {
               $mergeObjects: [
                 "$campaign",
-                { totalSent: "$totalSent", totalReject: "$totalReject" },
+                { totalSent: "$totalSent", totalRejected: "$totalRejected" },
               ],
             },
           },
@@ -137,6 +149,23 @@ class CampaignRepo {
           $project: {
             smss: 0,
             sms_details: 0,
+          },
+        },
+        {
+          $addFields: {
+            percentSent: {
+              $round: [
+                {
+                  $multiply: [
+                    {
+                      $divide: ["$totalSent", "$totalSms"],
+                    },
+                    100,
+                  ],
+                },
+                2,
+              ],
+            },
           },
         },
       ],

@@ -77,7 +77,6 @@ class SmsGate {
     smsArray.forEach((sms) => {
       destinationNumbers.push({ destination_addr: sms.destinationNumber });
     });
-    console.log(destinationNumbers);
     try {
       this.session.submit_multi(
         {
@@ -90,8 +89,6 @@ class SmsGate {
             let rejectArray = smsArray.map((sms) => {
               return sms._id;
             });
-            console.log("rejectedArrayyy");
-            console.log(rejectArray);
             onReject(rejectArray);
             updateCampaign(campaignName);
             return;
@@ -115,9 +112,6 @@ class SmsGate {
             }
             isRejected = false;
           });
-          console.log("smsIdSend");
-          console.log(smsIdSend);
-          console.log(smsIdReject);
           onSuccess(smsIdSend);
           onReject(smsIdReject);
           updateCampaign(campaignName);

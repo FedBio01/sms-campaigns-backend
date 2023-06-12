@@ -5,7 +5,6 @@ const Campaign = require("../models/Campaign");
 const { DateTime } = require("luxon");
 
 const initializeCampaign = async (req, res, next) => {
-  console.log(req.body.user.username);
   let creator = req.body.user.username;
   let campaignName = req.body.name;
   let messageText = req.body.message;
@@ -14,7 +13,6 @@ const initializeCampaign = async (req, res, next) => {
 
   let smsArray = numbers.map((number) => {
     let sms = new Sms(number, messageText, creationTime, campaignName);
-    console.log(sms);
     return sms;
   });
 
@@ -28,7 +26,6 @@ const initializeCampaign = async (req, res, next) => {
     smsArray.length,
     creationTime
   );
-  console.log(campaign);
   let campaignResult = await CampaignRepo.insertCampaign(campaign);
 
   return res.send(campaignResult);

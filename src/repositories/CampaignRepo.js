@@ -20,11 +20,53 @@ class CampaignRepo {
       campaignCollection
     );
   }
-  /*
-    insert
-  */
-  static async insertCampagna(campaign) {
-    return await db.insertDocument(campaign, campaignCollection);
+
+  //get multiple
+  static async getAllCampaign() {
+    return await db.getMultipleDocuments(campaignCollection);
+  }
+  /**
+   *
+   * @param {*} creatorName
+   * @returns
+   */
+  static async getMultipleCampaignNotActiveByCreator(creator) {
+    return await db.getMultipleDocuments(campaignCollection, {
+      creator: creator,
+      isStarted: false,
+    });
+  }
+
+  //insert
+  /**
+   * insert campaign in the database
+   * @param {Array} campaign - campaign object
+   * @returns object with aknowledget status and inserted ids of the campaigns
+   */
+  static async insertCampaign(campaign) {
+    return await db.insertSingleDocument(campaignCollection, campaign);
+  }
+
+  static async updateCampaignStartTime(campaign, time) {
+    await db.modifySingleDocument(
+      campaignCollection,
+      campaign,
+      {
+        $set: { start: time, isStarted: true },
+      },
+      null
+    );
+  }
+
+  static async updateCampaignEndTime(campaign, time) {
+    await db.modifySingleDocument(
+      campaignCollection,
+      campaign,
+      {
+        $set: { finish: time },
+      },
+      null
+    );
   }
 }
 

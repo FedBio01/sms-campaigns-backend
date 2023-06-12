@@ -60,6 +60,76 @@ class SmsGate {
       console.error(error);
     }
   }
+  /*
+  sendCampaign(smsArray, onSuccess, onReject) {
+    smsArray.forEach((sms) => {
+      const sleep = () => {
+        return new Promise(resolve => setTimeout(resolve, 200))
+      }
+      this.sendSms(sms, onSuccess, onReject);
+    });
+  }
+*/
+
+  sendCampaign(smsArray, onSuccess, onReject, updateCampaign) {
+    let message = smsArray[0].message;
+    let campaignName = smsArray[0].campaign;
+    let arrayLenght = smsArray.length;
+    let destinationNumbers = new Array();
+
+    smsArray.forEach((sms) => {
+      destinationNumbers.push({ destination_addr: sms.destinationNumber });
+    });
+    console.log(destinationNumbers);
+    try {
+      this.session.submit_multi(
+        {
+          dest_address: destinationNumbers,
+          short_message: message,
+        },
+        (pdu) => {
+          if (pdu.command_status !== 0) {
+            //se non va a buon fine
+            let rejectArray = smsArray.map((sms) => {
+              return sms._id;
+            });
+            console.log("rejectedArrayyy");
+            console.log(rejectArray);
+            onReject(rejectArray);
+            updateCampaign(campaignName);
+            return;
+          }
+          let pduUnsuccessField = pdu.unsuccess_sme;
+          const smsIdSend = new Array();
+          const smsIdReject = new Array();
+          //soluzione mia
+          let isRejected = false;
+          smsArray.forEach((sms) => {
+            pduUnsuccessField.forEach((remove) => {
+              if (sms.destinationNumber === remove.destination_addr) {
+                isRejected = true;
+                return;
+              }
+            });
+            if (isRejected) {
+              smsIdReject.push(sms._id);
+            } else {
+              smsIdSend.push(sms._id);
+            }
+            isRejected = false;
+          });
+          console.log("smsIdSend");
+          console.log(smsIdSend);
+          console.log(smsIdReject);
+          onSuccess(smsIdSend);
+          onReject(smsIdReject);
+          updateCampaign(campaignName);
+        }
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
 }
 
 module.exports = new SmsGate();

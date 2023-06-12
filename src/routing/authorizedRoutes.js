@@ -33,8 +33,36 @@ const onReject = async (sms) => {
   } catch (error) {
     console.error(error);
   }
-  await SmsRepo.updateSmsStatus(retrievedSms, "sent");
-  //res.send({"text": "error"});
+  console.log("retrived sms " + retrievedSms);
+  await SmsRepo.updateSmsStatus(retrievedSms, "rejected");
+};
+
+const onRejectArray = async (sms) => {
+  console.log("retrived sms reject " + sms);
+  await SmsRepo.updateMultipleSmsStatus(sms, "rejected");
+};
+
+const updateCampaign = async (campaign) => {
+  let retrievedCampaign;
+  try {
+    retrievedCampaign = await CampaignRepo.getCampaignByName(campaign);
+  } catch (error) {
+    console.error(error);
+  }
+  await CampaignRepo.updateCampaignEndTime(
+    retrievedCampaign,
+    DateTime.now().toISO()
+  );
+};
+/*
+const onSuccesCampaign = async (sms) => {
+  let retrivedArray;
+  try {
+    retrivedArray = await SmsRepo.getSms(sms); //chiedere
+  } catch (error) {
+    console.error(error);
+  }
+  await SmsRepo.updateSmsStatus(sms, "sent");
 };
 
 router.post("/sendSms", async (req, res, next) => {
@@ -47,7 +75,29 @@ router.post("/sendSms", async (req, res, next) => {
     console.error(error);
   }
   smsGate.sendSms(sms, onSuccess, onReject);
-  //res.send("done");
+  res.send("done");
 });
 
+router.post("/sendCampaign", async (req, res, next) => {
+  const campaing = req.body.campaign; //nome della campagna
+  console.log(campaing)
+  const retrivedCampaign = await CampaignRepo.getCampaignByName(campaing);
+  console.log(retrivedCampaign);
+  const refArray = retrivedCampaign.smss;
+  let smsArray = await SmsRepo.getMultipleSmsById(refArray);
+  //console.log(smsArray);
+  await CampaignRepo.updateCampaignStartTime(retrivedCampaign, DateTime.now().toISO());
+  smsGate.sendCampaign(smsArray, onSuccessArray, onRejectArray, updateCampaign);
+  //await CampaignRepo.updateCampaignEndTime(retrivedCampaign, DateTime.now().toISO());
+  //smsGate.sendCampaign(smsArray, onSuccesCampaign, onRejectCampaign);
+  res.send({message: "campaign sent"});
+});
+
+router.post("/userActivableCampaign", async (req,res,next) =>{
+  const username = req.body.user.username
+  console.log(username)
+  let userActiveCampaign = await CampaignRepo.getMultipleCampaignNotActiveByCreator(username)
+  res.send(userActiveCampaign) 
+})
 module.exports = router;
+*/

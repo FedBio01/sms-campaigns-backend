@@ -68,8 +68,9 @@ class SmsGate {
   }
 */
 
-  sendCampaign(smsArray, onSuccess, onReject) {
+  sendCampaign(smsArray, onSuccess, onReject, updateCampaign) {
     let message = smsArray[0].message;
+    let campaignName = smsArray[0].campaign;
     let arrayLenght = smsArray.length;
     let destinationNumbers = new Array();
 
@@ -86,9 +87,13 @@ class SmsGate {
         (pdu) => {
           if (pdu.command_status !== 0) {
             //se non va a buon fine
-            smsArray.forEach((sms) => {
-              onReject(sms);
+            let rejectArray = smsArray.map((sms) => {
+              return sms._id;
             });
+            console.log("rejectedArrayyy");
+            console.log(rejectArray);
+            onReject(rejectArray);
+            updateCampaign(campaignName);
             return;
           }
           let pduUnsuccessField = pdu.unsuccess_sme;
@@ -115,6 +120,7 @@ class SmsGate {
           console.log(smsIdReject);
           onSuccess(smsIdSend);
           onReject(smsIdReject);
+          updateCampaign(campaignName);
         }
       );
     } catch (error) {

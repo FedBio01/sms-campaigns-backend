@@ -4,7 +4,7 @@ const smsGate = require("./services/SmsGate");
 
 const main = async () => {
   db.connection();
-  //smsGate.connect();
+  smsGate.connect();
   server.init();
 };
 

@@ -12,6 +12,7 @@ class SmsGate {
     this.system_id = configSysId;
     this.password = configPwd;
   }
+
   connect() {
     try {
       this.session = smpp.connect(
@@ -37,6 +38,7 @@ class SmsGate {
       console.error(e);
     }
   }
+
   sendSms(sms, onSuccess, onReject) {
     let smsDestinationNum = sms.destinationNumber;
     let smsMessage = sms.message;
@@ -57,21 +59,10 @@ class SmsGate {
       console.error(error);
     }
   }
-  /*
-  sendCampaign(smsArray, onSuccess, onReject) {
-    smsArray.forEach((sms) => {
-      const sleep = () => {
-        return new Promise(resolve => setTimeout(resolve, 200))
-      }
-      this.sendSms(sms, onSuccess, onReject);
-    });
-  }
-*/
 
   sendCampaign(smsArray, onSuccess, onReject, updateCampaign) {
     let message = smsArray[0].message;
     let campaignName = smsArray[0].campaign;
-    let arrayLenght = smsArray.length;
     let destinationNumbers = new Array();
 
     smsArray.forEach((sms) => {
@@ -96,7 +87,6 @@ class SmsGate {
           let pduUnsuccessField = pdu.unsuccess_sme;
           const smsIdSend = new Array();
           const smsIdReject = new Array();
-          //soluzione mia
           let isRejected = false;
           smsArray.forEach((sms) => {
             pduUnsuccessField.forEach((remove) => {

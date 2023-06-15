@@ -1,5 +1,5 @@
 const db = require("../services/DataBase");
-const userCollection = "users";
+const userCollection = "user";
 
 class UserRepo {
   static async getUserByUsername(username) {

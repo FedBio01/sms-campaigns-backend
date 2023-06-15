@@ -2,7 +2,7 @@ const express = require("express");
 const campaignsMiddleware = require("./campaignsMiddlewares");
 const router = express.Router();
 
-router.get("/user-campaing", campaignsMiddleware.userCampaign);
+router.get("/user-campaign", campaignsMiddleware.userCampaign);
 
 router.get("/visualize-campaign", campaignsMiddleware.visualizeCampaign);
 

@@ -3,6 +3,7 @@ const campaignCollection = "campaign";
 
 class CampaignRepo {
   //get single
+
   /**
    * get the Campaign given
    * @param campaign - campaign da cercare nel db
@@ -24,11 +25,13 @@ class CampaignRepo {
   }
 
   //get multiple
+
   static async getAllCampaign() {
     return await db.getMultipleDocuments(campaignCollection);
   }
+
   /**
-   *
+   *get campaigns by creator name
    * @param {} creatorName -
    * @returns
    */
@@ -41,7 +44,7 @@ class CampaignRepo {
   /**
    *get multiple active campaign not active by the creator name
    * @param {*} creatorName
-   * @returns
+   * @returns array of campaign
    */
   static async getMultipleCampaignNotActiveByCreator(creator) {
     return await db.getMultipleDocuments(campaignCollection, {
@@ -51,6 +54,7 @@ class CampaignRepo {
   }
 
   //insert single
+
   /**
    * insert campaign in the database
    * @param {Array} campaign - campaign object
@@ -59,11 +63,13 @@ class CampaignRepo {
   static async insertCampaign(campaign) {
     return await db.insertSingleDocument(campaignCollection, campaign);
   }
+
   //update single
+
   /**
    * update campaign start time
    * @param {*} campaign - campaign name
-   * @param {*} time - time to set
+   * @param {luxon.DateTime.now().toUTC().toISO()} time - time to set
    */
   static async updateCampaignStartTime(campaign, time) {
     await db.modifySingleDocument(
@@ -78,8 +84,8 @@ class CampaignRepo {
 
   /**
    * update campaign end time
-   * @param {*} campaign - campaign name
-   * @param {*} time - time to set
+   * @param {Camapign} campaign - campaign name
+   * @param {luxon.DateTime.now().toUTC().toISO()} time - time to set
    */
   static async updateCampaignEndTime(campaign, time) {
     await db.modifySingleDocument(
@@ -93,8 +99,9 @@ class CampaignRepo {
   }
 
   //aggregate
+
   /**
-   * statistic of the requested campaign
+   * statistics of the requested campaign
    * @param {string} creator - name of the user
    * @returns array with statistics
    */
@@ -132,6 +139,24 @@ class CampaignRepo {
                 $cond: [{ $eq: ["$sms_details.status", "rejected"] }, 1, 0],
               },
             },
+            smsArraySentTimes: {
+              $push: {
+                $cond: [
+                  { $eq: ["$sms_details.status", "sent"] },
+                  "$sms_details.sentTime",
+                  "$$REMOVE",
+                ],
+              },
+            },
+            smsArrayDeliveryTimes: {
+              $push: {
+                $cond: [
+                  { $eq: ["$sms_details.status", "sent"] },
+                  "$sms_details.deliveryTime",
+                  "$$REMOVE",
+                ],
+              },
+            },
             campaign: { $first: "$$ROOT" },
           },
         },
@@ -140,7 +165,12 @@ class CampaignRepo {
             newRoot: {
               $mergeObjects: [
                 "$campaign",
-                { totalSent: "$totalSent", totalRejected: "$totalRejected" },
+                {
+                  totalSent: "$totalSent",
+                  totalRejected: "$totalRejected",
+                  smsArrayDeliveryTimes: "$smsArrayDeliveryTimes",
+                  smsArraySentTimes: "$smsArraySentTimes",
+                },
               ],
             },
           },
@@ -164,6 +194,38 @@ class CampaignRepo {
                   ],
                 },
                 2,
+              ],
+            },
+            avgSentTime: {
+              $divide: [
+                {
+                  $avg: {
+                    $map: {
+                      input: {
+                        $range: [0, { $size: "$smsArrayDeliveryTimes" }],
+                      },
+                      as: "index",
+                      in: {
+                        $subtract: [
+                          {
+                            $toDate: {
+                              $arrayElemAt: [
+                                "$smsArrayDeliveryTimes",
+                                "$$index",
+                              ],
+                            },
+                          },
+                          {
+                            $toDate: {
+                              $arrayElemAt: ["$smsArraySentTimes", "$$index"],
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  },
+                },
+                1000,
               ],
             },
           },

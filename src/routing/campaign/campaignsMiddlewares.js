@@ -15,9 +15,9 @@ const onSuccess = async (sms) => {
   }
 
   await SmsRepo.updateSmsStatusAndSentTime(
-    retrievedSms[0],
+    retrievedSms,
     "sent",
-    DateTime.now().toISO()
+    DateTime.now().toUTC().toISO()
   );
 };
 
@@ -34,9 +34,9 @@ const onReject = async (sms) => {
 const sendSms = async (req, res, next) => {
   const destNumber = req.body.destinationNumber;
   const message = req.body.message;
-  let sms = new Sms(destNumber, message, DateTime.now().toISO());
+  let sms = new Sms(destNumber, message, DateTime.now().toUTC().toISO());
   try {
-    await SmsRepo.insertSms([sms]);
+    await SmsRepo.insertSms(sms);
   } catch (error) {
     console.error(error);
   }
@@ -45,14 +45,16 @@ const sendSms = async (req, res, next) => {
 };
 
 const onSuccessArray = async (sms) => {
-  await SmsRepo.updateMultipleSmsStatusAndSentTime(
+  //delivery time
+  await SmsRepo.updateMultipleSmsStatusAndDeliveryTimeById(
     sms,
     "sent",
-    DateTime.now().toISO()
+    DateTime.now().toUTC().toISO()
   );
 };
+
 const onRejectArray = async (sms) => {
-  await SmsRepo.updateMultipleSmsStatus(sms, "rejected");
+  await SmsRepo.updateMultipleSmsStatusById(sms, "rejected");
 };
 
 const updateCampaign = async (campaign) => {
@@ -64,7 +66,7 @@ const updateCampaign = async (campaign) => {
   }
   await CampaignRepo.updateCampaignEndTime(
     retrievedCampaign,
-    DateTime.now().toISO()
+    DateTime.now().toUTC().toISO()
   );
 };
 
@@ -73,18 +75,26 @@ const sendCampaign = async (req, res, next) => {
   const retrivedCampaign = await CampaignRepo.getCampaignByName(campaing);
   const refArray = retrivedCampaign.smss;
   let smsArray = await SmsRepo.getMultipleSmsById(refArray);
+  let smsIds = smsArray.map((sms) => {
+    return sms._id;
+  });
   await CampaignRepo.updateCampaignStartTime(
     retrivedCampaign,
-    DateTime.now().toISO()
+    DateTime.now().toUTC().toISO()
   );
   // 255 is the max numbers of sms that the sms gate can recieve with a pdu
-  let maxCap = 255;
+  let maxCap = 2;
   let upperbound = Math.ceil(smsArray.length / maxCap);
 
   for (let i = 0; i < upperbound; i++) {
     let smsSlice = smsArray.slice(i * maxCap, i * maxCap + maxCap);
+    let smsIdsSlice = smsIds.slice(i * maxCap, i * maxCap + maxCap);
     new Promise((resolve, reject) => {
       setTimeout(() => {
+        SmsRepo.updateMultipleSmsSentTimeById(
+          smsIdsSlice,
+          DateTime.now().toUTC().toISO()
+        );
         smsGate.sendCampaign(
           smsSlice,
           onSuccessArray,
@@ -121,7 +131,7 @@ const initializeCampaign = async (req, res, next) => {
   let campaignName = req.body.name;
   let messageText = req.body.message;
   let numbers = req.body.destinationNumbers;
-  let creationTime = DateTime.now().toISO();
+  let creationTime = DateTime.now().toUTC().toISO();
 
   let smsArray = numbers.map((number) => {
     let sms = new Sms(number, messageText, creationTime, campaignName);
@@ -146,7 +156,6 @@ const initializeCampaign = async (req, res, next) => {
 const getStatisticsByUser = async (req, res, next) => {
   let user = req.body.user.username;
   let result = await CampaignRepo.getAllCampaignStatisticsByUserStarted(user);
-  console.log(result);
   res.send(result);
 };
 

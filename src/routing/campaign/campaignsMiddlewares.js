@@ -5,6 +5,7 @@ const CampaignRepo = require("../../repositories/CampaignRepo");
 const SmsRepo = require("../../repositories/SmsRepo");
 const smsGate = require("../../services/SmsGate");
 const Sms = require("../../models/Sms");
+const Campaign = require("../../models/Campaign");
 
 const onSuccess = async (sms) => {
   let retrievedSms;
